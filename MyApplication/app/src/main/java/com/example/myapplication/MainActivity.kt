@@ -1,5 +1,6 @@
 package com.example.idvonesdk
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 
@@ -10,7 +11,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         // Load WebViewActivity
-        val webViewIntent = WebViewActivity.newIntent(this)
+        val webViewIntent = Intent(this, WebViewActivity::class.java)
         startActivity(webViewIntent)
         finish()
     }
