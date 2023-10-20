@@ -1,7 +1,6 @@
 package com.example.idvonesdk
 
 import android.Manifest
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.net.http.SslError
@@ -17,8 +16,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import com.example.myapplication.MachineTokenFetcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -75,13 +80,21 @@ class WebViewActivity : AppCompatActivity() {
         // Check and request permissions
         requestPermissionsIfNecessary()
 
-        // Load the HTML file from assets
-        webView.loadUrl("https://192.168.1.105:5500/index.html")
+        GlobalScope.launch(Dispatchers.Main) {
+            val machineToken = fetchMachineToken()
 
+            val machinetoken = URLEncoder.encode(machineToken, StandardCharsets.UTF_8.toString())
 
-        // Set a WebViewClient to handle links within the WebView
-        webView.webViewClient = MyWebViewClient()
-        webView.webChromeClient = MyWebChromeClient()
+            // Construct the URL with the machine token as a query parameter
+            val urlWithQuery = "https://192.168.0.36:5500/idv_page.html?machinetoken=$machinetoken"
+
+            // Set a WebViewClient to handle links within the WebView
+            webView.webViewClient = MyWebViewClient()
+            webView.webChromeClient = MyWebChromeClient()
+
+            // Load the URL in the WebView
+            webView.loadUrl(urlWithQuery)
+        }
     }
 
     private fun requestPermissionsIfNecessary() {
@@ -94,6 +107,11 @@ class WebViewActivity : AppCompatActivity() {
         if (permissionsToRequest.isNotEmpty()) {
             ActivityCompat.requestPermissions(this, permissionsToRequest.toTypedArray(), PERMISSION_REQUEST_CODE)
         }
+    }
+
+    private suspend fun fetchMachineToken(): String {
+        val machineTokenFetcher = MachineTokenFetcher()
+        return machineTokenFetcher.fetchMachineToken()
     }
 
     private inner class MyWebViewClient : WebViewClient() {

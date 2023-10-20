@@ -14,4 +14,14 @@
             android:text="MainActivity"
             android:textSize="24sp" />
 
+    <TextView
+        android:id="@+id/tokenTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="Machine Token will be displayed here"
+        />
+
 </LinearLayout>
